@@ -1,0 +1,40 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies and build outputs
+node_modules/
+.vendor/
+vendor/
+dist/
+build/
+out/
+.tmp/
+tmp/
+.cache/
+
+# Logs and coverage
+*.log
+logs/
+coverage/
+.nyc_output/
+
+# Local database/storage volumes
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+volumes/
