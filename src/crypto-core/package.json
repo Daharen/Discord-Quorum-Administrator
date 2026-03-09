@@ -1,0 +1,9 @@
+{
+  "name": "crypto-core",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node --test dist/test/**/*.test.js"
+  }
+}
