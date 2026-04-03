@@ -13,6 +13,7 @@ export interface GuildBotConfig {
   governanceQuorumNumerator: number;
   governanceQuorumDenominator: number;
   governanceProposalTtlSeconds: number;
+  custodyApiBaseUrl?: string;
 }
 
 function required(name: string): string {
@@ -52,5 +53,6 @@ export function loadConfig(): GuildBotConfig {
     governanceQuorumNumerator,
     governanceQuorumDenominator,
     governanceProposalTtlSeconds: intWithDefault("GOVERNANCE_PROPOSAL_TTL_SECONDS", 86_400),
+    custodyApiBaseUrl: process.env.CUSTODY_API_BASE_URL?.trim() || undefined,
   };
 }
