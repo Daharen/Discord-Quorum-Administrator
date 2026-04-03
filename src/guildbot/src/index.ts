@@ -4,7 +4,7 @@ import { createDiscordClient } from "./discord/client.js";
 import { CommandRouter } from "./discord/command-router.js";
 import { AuditLog } from "./governance/audit-log.js";
 import { GovernanceCommandHandlers } from "./governance/command-handlers.js";
-import { NoopCustodySyncPublisher } from "./governance/custody-sync.js";
+import { HttpCustodySyncPublisher, NoopCustodySyncPublisher } from "./governance/custody-sync.js";
 import { GovernanceEventEmitter } from "./governance/event-emitter.js";
 import { ProposalEngine } from "./governance/proposal-engine.js";
 import { ProposalStore } from "./governance/proposal-store.js";
@@ -22,6 +22,10 @@ async function main(): Promise<void> {
     config.guildbotServicePublicKeyB64,
   );
 
+  const custodyPublisher = config.custodyApiBaseUrl
+    ? new HttpCustodySyncPublisher(`${config.custodyApiBaseUrl}/bot/events`, logger)
+    : new NoopCustodySyncPublisher(logger);
+
   const engine = new ProposalEngine(
     {
       quorumNumerator: config.governanceQuorumNumerator,
@@ -34,7 +38,7 @@ async function main(): Promise<void> {
     eventEmitter,
     new AuditLog(resolve("runtime/audit/governance.ndjson")),
     logger,
-    new NoopCustodySyncPublisher(logger),
+    custodyPublisher,
   );
 
   const handlers = new GovernanceCommandHandlers(

@@ -1,11 +1,19 @@
 # Custody API
 
-Responsibility: external custody and quorum authorization service.
+Deterministic custody authority service for membership synchronization, key registration, quorum sessions, and append-only audit logging.
 
-Custody API maintains the canonical administrator registry derived from GuildBot events.
+## Endpoints
 
-Custody API manages sessions, key registrations, encrypted recovery kits, and policy enforcement.
+- `GET /health`
+- `POST /bot/events`
+- `POST /keys/register`
+- `POST /sessions/create`
+- `POST /sessions/:sessionId/approve`
+- `GET /sessions/:sessionId`
+- `GET /audit`
 
-Custody API governs quorum authorization and encrypted recovery materials but does not perform routine Discord governance.
+## Constraints
 
-Implementation begins after Crypto Core message formats are defined.
+- No plaintext recovery kit reveal endpoint.
+- No direct Discord governance operations.
+- GuildBot governance events must be signed and verified.
