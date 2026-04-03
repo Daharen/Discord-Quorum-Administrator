@@ -272,6 +272,57 @@ src/custody-portal/
 
 11.5.2 Do not restate full document contents unless explicitly requested.
 
+11.6 CODEX Validation and Reporting Rule
+
+11.6.1 For any non-documentation code commit, CODEX must run the relevant build and automated tests before presenting completion.
+
+11.6.2 CODEX must not describe a feature as working unless it has either:
+
+11.6.2.1 passed automated validation inside the repository, or
+11.6.2.2 been explicitly labeled unvalidated due to unavailable external runtime dependencies.
+
+11.6.3 CODEX must include a Testing section in every completion report.
+
+11.7 Required Testing Section Format
+
+11.7.1 At the end of each CODEX completion report, the Testing section must include:
+
+11.7.1.1 Build / typecheck commands run.
+11.7.1.2 Test commands run.
+11.7.1.3 Result summary.
+11.7.1.4 What was validated.
+11.7.1.5 What remains unvalidated.
+11.7.1.6 Any assumptions or test doubles used.
+
+11.8 Required Validation Gates for the Next Sprint
+
+11.8.1 For the GuildBot minimal governance kernel commit, CODEX must run at minimum:
+
+11.8.1.1 package install resolution.
+11.8.1.2 TypeScript build.
+11.8.1.3 all vitest unit tests.
+11.8.1.4 any file-based audit-log tests using temporary paths.
+
+11.8.2 The commit is not complete unless these gates pass.
+
+11.9 Required Testing Philosophy
+
+11.9.1 Because the project is deterministic, tests should prefer:
+
+11.9.1.1 pure functions.
+11.9.1.2 fixed fixtures.
+11.9.1.3 stable canonical payload snapshots.
+11.9.1.4 explicit timestamp injection.
+11.9.1.5 explicit nonce injection where possible in tests.
+
+11.9.2 Avoid tests that depend on live clocks, random identifiers, or ambient runtime state unless wrapped behind injectable interfaces.
+
+11.9.3 This aligns with the determinism doctrine and reduces false confidence.
+
+11.10 Standing Recommendation
+
+11.10.1 Treat these requirements as a standing project rule for future CODEX lanes.
+
 ────────────────────────────────────────────────────────
 
 End CHECKPOINT v1.
