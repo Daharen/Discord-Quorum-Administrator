@@ -14,6 +14,7 @@ export interface GuildBotConfig {
   governanceQuorumDenominator: number;
   governanceProposalTtlSeconds: number;
   custodyApiBaseUrl?: string;
+  runtimeMode: "standalone" | "compose";
 }
 
 function required(name: string): string {
@@ -54,5 +55,6 @@ export function loadConfig(): GuildBotConfig {
     governanceQuorumDenominator,
     governanceProposalTtlSeconds: intWithDefault("GOVERNANCE_PROPOSAL_TTL_SECONDS", 86_400),
     custodyApiBaseUrl: process.env.CUSTODY_API_BASE_URL?.trim() || undefined,
+    runtimeMode: (process.env.GUILDBOT_RUNTIME_MODE?.trim().toLowerCase() === "compose" ? "compose" : "standalone"),
   };
 }

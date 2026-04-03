@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canonicalizePayload, generateKeyPair, sha256, signPayload } from "../../crypto-core/src/index.js";
+import { canonicalizePayload, generateKeyPair, sha256, signPayload } from "crypto-core";
 import { GuildBotEventVerifier } from "../src/crypto/guildbot-event-verifier.js";
 
 const clock = { nowMs: () => 1_000_000 };

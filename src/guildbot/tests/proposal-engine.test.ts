@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { generateKeyPair } from "../../crypto-core/src/index.js";
+import { generateKeyPair } from "crypto-core";
 import { AuditLog } from "../src/governance/audit-log.js";
 import { GovernanceEventEmitter } from "../src/governance/event-emitter.js";
 import { ProposalEngine } from "../src/governance/proposal-engine.js";

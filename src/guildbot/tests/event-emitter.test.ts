@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canonicalizePayload, generateKeyPair } from "../../crypto-core/src/index.js";
+import { canonicalizePayload, generateKeyPair } from "crypto-core";
 import { GovernanceEventEmitter } from "../src/governance/event-emitter.js";
 
 describe("GovernanceEventEmitter", () => {

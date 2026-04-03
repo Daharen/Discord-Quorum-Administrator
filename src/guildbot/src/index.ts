@@ -22,8 +22,9 @@ async function main(): Promise<void> {
     config.guildbotServicePublicKeyB64,
   );
 
-  const custodyPublisher = config.custodyApiBaseUrl
-    ? new HttpCustodySyncPublisher(`${config.custodyApiBaseUrl}/bot/events`, logger)
+  const custodyBaseUrl = config.custodyApiBaseUrl ?? (config.runtimeMode === "compose" ? "http://custody-api:8080" : undefined);
+  const custodyPublisher = custodyBaseUrl
+    ? new HttpCustodySyncPublisher(`${custodyBaseUrl}/bot/events`, logger)
     : new NoopCustodySyncPublisher(logger);
 
   const engine = new ProposalEngine(

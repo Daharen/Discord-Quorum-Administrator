@@ -7,20 +7,20 @@ export class SealedKitStore {
     private readonly clock: Clock,
   ) {}
 
-  put(ciphertextB64: string, metadata: Record<string, unknown>): { version: number } {
-    const current = this.repository.getCurrent();
+  async put(ciphertextB64: string, metadata: Record<string, unknown>): Promise<{ version: number }> {
+    const current = await this.repository.getCurrent();
     const version = (current?.version ?? 0) + 1;
-    this.repository.upsert({ version, ciphertextB64, metadata, updatedAtMs: this.clock.nowMs() });
+    await this.repository.upsert({ version, ciphertextB64, metadata, updatedAtMs: this.clock.nowMs() });
     return { version };
   }
 
-  getCurrentMetadata(): { version: number; metadata: Record<string, unknown> } | undefined {
-    const current = this.repository.getCurrent();
+  async getCurrentMetadata(): Promise<{ version: number; metadata: Record<string, unknown> } | undefined> {
+    const current = await this.repository.getCurrent();
     if (!current) return undefined;
     return { version: current.version, metadata: current.metadata };
   }
 
-  getCurrentCiphertext(): string | undefined {
-    return this.repository.getCurrent()?.ciphertextB64;
+  async getCurrentCiphertext(): Promise<string | undefined> {
+    return (await this.repository.getCurrent())?.ciphertextB64;
   }
 }

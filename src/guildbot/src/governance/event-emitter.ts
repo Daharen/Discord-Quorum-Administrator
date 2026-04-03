@@ -5,7 +5,7 @@ import {
   sha256,
   signPayload,
   verifySignature,
-} from "../../../crypto-core/src/index.js";
+} from "crypto-core";
 import { GOVERNANCE_EVENT_VERSION } from "./constants.js";
 import { deriveEventId } from "../util/ids.js";
 import type { GovernanceEventType, SignedGovernanceEvent } from "../types.js";

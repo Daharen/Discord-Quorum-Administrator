@@ -4,11 +4,11 @@ import type { AuditEntryRecord } from "../../types.js";
 export class InMemoryAuditRepository implements AuditRepository {
   private readonly entries: AuditEntryRecord[] = [];
 
-  append(entry: AuditEntryRecord): void {
+  async append(entry: AuditEntryRecord): Promise<void> {
     this.entries.push(entry);
   }
 
-  list(): AuditEntryRecord[] {
+  async list(): Promise<AuditEntryRecord[]> {
     return [...this.entries];
   }
 }

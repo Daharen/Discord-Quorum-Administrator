@@ -1,4 +1,4 @@
-import { canonicalizePayload, sha256, verifySignature } from "../../../crypto-core/src/index.js";
+import { canonicalizePayload, sha256, verifySignature } from "crypto-core";
 import type { SessionRepository } from "../repositories/interfaces.js";
 import type { Clock } from "../util/clock.js";
 import { newId } from "../util/ids.js";
@@ -16,7 +16,7 @@ export class SessionEngine {
     private readonly sessionTtlSeconds: number,
   ) {}
 
-  createSession(scope: string, actionType: string, payloadData: Record<string, unknown>): CustodySessionRecord {
+  async createSession(scope: string, actionType: string, payloadData: Record<string, unknown>): Promise<CustodySessionRecord> {
     const sessionId = newId("session");
     const createdAtMs = this.clock.nowMs();
     const canonicalPayload: CanonicalSessionPayload = {
@@ -33,27 +33,27 @@ export class SessionEngine {
       scope,
       createdAtMs,
       expiresAtMs: createdAtMs + this.sessionTtlSeconds * 1000,
-      requiredThreshold: this.membershipRegistry.getCurrentThreshold(),
+      requiredThreshold: await this.membershipRegistry.getCurrentThreshold(),
       policyVersion: this.membershipRegistry.getPolicyVersion(),
       canonicalPayloadHash: sha256(canonicalizePayload(canonicalPayload)),
       canonicalPayload,
       status: "pending",
       approvals: [],
     };
-    this.sessions.create(session);
+    await this.sessions.create(session);
     return session;
   }
 
-  submitApproval(sessionId: string, signerDiscordUserId: string, signatureB64: string): CustodySessionRecord {
-    const session = this.requireSession(sessionId);
+  async submitApproval(sessionId: string, signerDiscordUserId: string, signatureB64: string): Promise<CustodySessionRecord> {
+    const session = await this.requireSession(sessionId);
     if (session.status === "closed" || session.status === "expired") throw new Error("session not active");
     if (this.clock.nowMs() > session.expiresAtMs) {
       session.status = "expired";
-      this.sessions.save(session);
+      await this.sessions.save(session);
       throw new Error("session expired");
     }
 
-    if (!this.membershipRegistry.isActive(signerDiscordUserId)) {
+    if (!(await this.membershipRegistry.isActive(signerDiscordUserId))) {
       throw new Error("signer is not active custodian");
     }
 
@@ -61,7 +61,7 @@ export class SessionEngine {
       throw new Error("duplicate approval");
     }
 
-    const key = this.keyRegistry.getActiveKeyForCustodian(signerDiscordUserId);
+    const key = await this.keyRegistry.getActiveKeyForCustodian(signerDiscordUserId);
     if (!key) throw new Error("missing active key");
 
     const isValid = verifySignature(session.canonicalPayload, {
@@ -86,45 +86,45 @@ export class SessionEngine {
       session.status = "authorized";
     }
 
-    this.sessions.save(session);
+    await this.sessions.save(session);
     return session;
   }
 
-  expireSession(sessionId: string): CustodySessionRecord {
-    const session = this.requireSession(sessionId);
+  async expireSession(sessionId: string): Promise<CustodySessionRecord> {
+    const session = await this.requireSession(sessionId);
     session.status = "expired";
-    this.sessions.save(session);
+    await this.sessions.save(session);
     return session;
   }
 
-  closeSession(sessionId: string): CustodySessionRecord {
-    const session = this.requireSession(sessionId);
+  async closeSession(sessionId: string): Promise<CustodySessionRecord> {
+    const session = await this.requireSession(sessionId);
     session.status = "closed";
-    this.sessions.save(session);
+    await this.sessions.save(session);
     return session;
   }
 
-  invalidateSupersededApprovals(newPolicyVersion: number): number {
+  async invalidateSupersededApprovals(newPolicyVersion: number): Promise<number> {
     let invalidated = 0;
-    for (const session of this.sessions.listAll()) {
+    for (const session of await this.sessions.listAll()) {
       if (session.status !== "pending") continue;
       if (session.policyVersion >= newPolicyVersion) continue;
       const kept = session.approvals.filter((approval) => approval.policyVersion >= newPolicyVersion);
       if (kept.length !== session.approvals.length) {
         session.approvals = kept;
         invalidated += 1;
-        this.sessions.save(session);
+        await this.sessions.save(session);
       }
     }
     return invalidated;
   }
 
-  getSession(sessionId: string): CustodySessionRecord | undefined {
+  getSession(sessionId: string): Promise<CustodySessionRecord | undefined> {
     return this.sessions.get(sessionId);
   }
 
-  private requireSession(sessionId: string): CustodySessionRecord {
-    const session = this.sessions.get(sessionId);
+  private async requireSession(sessionId: string): Promise<CustodySessionRecord> {
+    const session = await this.sessions.get(sessionId);
     if (!session) throw new Error("unknown session");
     return session;
   }

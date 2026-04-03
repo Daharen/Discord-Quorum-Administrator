@@ -4,19 +4,19 @@ import type { CustodySessionRecord } from "../../types.js";
 export class InMemorySessionRepository implements SessionRepository {
   private readonly records = new Map<string, CustodySessionRecord>();
 
-  create(session: CustodySessionRecord): void {
+  async create(session: CustodySessionRecord): Promise<void> {
     this.records.set(session.sessionId, session);
   }
 
-  save(session: CustodySessionRecord): void {
+  async save(session: CustodySessionRecord): Promise<void> {
     this.records.set(session.sessionId, session);
   }
 
-  get(sessionId: string): CustodySessionRecord | undefined {
+  async get(sessionId: string): Promise<CustodySessionRecord | undefined> {
     return this.records.get(sessionId);
   }
 
-  listAll(): CustodySessionRecord[] {
+  async listAll(): Promise<CustodySessionRecord[]> {
     return [...this.records.values()];
   }
 }

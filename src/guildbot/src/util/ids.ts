@@ -1,4 +1,4 @@
-import { generateNonce, sha256 } from "../../../crypto-core/src/index.js";
+import { generateNonce, sha256 } from "crypto-core";
 
 export function generateProposalId(): string {
   return `prop_${generateNonce().slice(0, 20)}`;

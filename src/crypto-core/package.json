@@ -2,8 +2,20 @@
   "name": "crypto-core",
   "version": "0.0.1",
   "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "npm run build && node --test dist/test/**/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
   }
 }
