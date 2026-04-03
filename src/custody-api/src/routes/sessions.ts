@@ -14,14 +14,14 @@ interface ApproveSessionBody {
 
 export function registerSessionsRoute(app: FastifyInstance, service: CustodyService): void {
   app.post<{ Body: CreateSessionBody }>("/sessions/create", async (request, reply) => {
-    const session = service.createSession(request.body.scope, request.body.actionType, request.body.payload);
+    const session = await service.createSession(request.body.scope, request.body.actionType, request.body.payload);
     return reply.code(201).send(session);
   });
 
   app.post<{ Params: { sessionId: string }; Body: ApproveSessionBody }>(
     "/sessions/:sessionId/approve",
     async (request, reply) => {
-      const session = service.approveSession(
+      const session = await service.approveSession(
         request.params.sessionId,
         request.body.signerDiscordUserId,
         request.body.signatureB64,
@@ -31,7 +31,7 @@ export function registerSessionsRoute(app: FastifyInstance, service: CustodyServ
   );
 
   app.get<{ Params: { sessionId: string } }>("/sessions/:sessionId", async (request, reply) => {
-    const session = service.getSession(request.params.sessionId);
+    const session = await service.getSession(request.params.sessionId);
     if (!session) {
       return reply.code(404).send({ error: "not_found" });
     }

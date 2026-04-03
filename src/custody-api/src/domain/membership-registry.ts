@@ -12,7 +12,7 @@ export class MembershipRegistry {
     private readonly clock: Clock,
   ) {}
 
-  applyMembershipEvent(event: SignedGuildBotEventEnvelope): { policyVersion: number; changed: boolean } {
+  async applyMembershipEvent(event: SignedGuildBotEventEnvelope): Promise<{ policyVersion: number; changed: boolean }> {
     if (!["administrator_promoted", "administrator_removed"].includes(event.eventType)) {
       return { policyVersion: this.policyVersion, changed: false };
     }
@@ -23,7 +23,7 @@ export class MembershipRegistry {
 
     const status = event.eventType === "administrator_promoted" ? "active" : "removed";
     this.policyVersion += 1;
-    this.memberships.upsert({
+    await this.memberships.upsert({
       discordUserId,
       status,
       policyVersion: this.policyVersion,
@@ -33,23 +33,22 @@ export class MembershipRegistry {
     return { policyVersion: this.policyVersion, changed: true };
   }
 
-  isActive(discordUserId: string): boolean {
-    return this.memberships.get(discordUserId)?.status === "active";
+  async isActive(discordUserId: string): Promise<boolean> {
+    return (await this.memberships.get(discordUserId))?.status === "active";
   }
 
   getPolicyVersion(): number {
     return this.policyVersion;
   }
 
-  getActiveCustodianIds(): string[] {
-    return this.memberships
-      .listAll()
+  async getActiveCustodianIds(): Promise<string[]> {
+    return (await this.memberships.listAll())
       .filter((record) => record.status === "active")
       .map((record) => record.discordUserId)
       .sort();
   }
 
-  getCurrentThreshold(): number {
-    return computeRequiredThreshold(this.getActiveCustodianIds().length, this.policy);
+  async getCurrentThreshold(): Promise<number> {
+    return computeRequiredThreshold((await this.getActiveCustodianIds()).length, this.policy);
   }
 }

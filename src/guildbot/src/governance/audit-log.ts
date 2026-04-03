@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, appendFileSync, existsSync } from "node:fs";
 import { dirname } from "node:path";
-import { canonicalizePayload, sha256 } from "../../../crypto-core/src/index.js";
+import { canonicalizePayload, sha256 } from "crypto-core";
 import { AUDIT_LOG_VERSION } from "./constants.js";
 import type { SignedGovernanceEvent } from "../types.js";
 

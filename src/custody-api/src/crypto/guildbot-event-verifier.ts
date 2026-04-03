@@ -1,4 +1,4 @@
-import { canonicalizePayload, sha256, verifySignature } from "../../../crypto-core/src/index.js";
+import { canonicalizePayload, sha256, verifySignature } from "crypto-core";
 import type { SignedGuildBotEventEnvelope } from "../types.js";
 import type { Clock } from "../util/clock.js";
 

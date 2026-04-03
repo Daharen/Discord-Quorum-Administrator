@@ -3,11 +3,11 @@ import type { SealedKitRecord, SealedKitRepository } from "../interfaces.js";
 export class InMemorySealedKitRepository implements SealedKitRepository {
   private current: SealedKitRecord | undefined;
 
-  upsert(record: SealedKitRecord): void {
+  async upsert(record: SealedKitRecord): Promise<void> {
     this.current = record;
   }
 
-  getCurrent(): SealedKitRecord | undefined {
+  async getCurrent(): Promise<SealedKitRecord | undefined> {
     return this.current;
   }
 }

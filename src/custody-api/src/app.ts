@@ -5,6 +5,14 @@ import { InMemoryMembershipRepository } from "./repositories/in-memory/in-memory
 import { InMemoryKeyRepository } from "./repositories/in-memory/in-memory-key-repository.js";
 import { InMemorySessionRepository } from "./repositories/in-memory/in-memory-session-repository.js";
 import { InMemoryAuditRepository } from "./repositories/in-memory/in-memory-audit-repository.js";
+import { PostgresClient } from "./repositories/postgres/client.js";
+import { migrate } from "./repositories/postgres/migrate.js";
+import {
+  PostgresAuditRepository,
+  PostgresKeyRepository,
+  PostgresMembershipRepository,
+  PostgresSessionRepository,
+} from "./repositories/postgres/postgres-repositories.js";
 import { MembershipRegistry } from "./domain/membership-registry.js";
 import { KeyRegistry } from "./domain/key-registry.js";
 import { SessionEngine } from "./domain/session-engine.js";
@@ -17,14 +25,24 @@ import { registerKeysRoute } from "./routes/keys.js";
 import { registerSessionsRoute } from "./routes/sessions.js";
 import { registerAuditRoute } from "./routes/audit.js";
 
-export function buildApp(config: CustodyConfig) {
+export async function buildApp(config: CustodyConfig) {
   const app = Fastify();
   const clock = new SystemClock();
 
-  const membershipRepo = new InMemoryMembershipRepository();
-  const keyRepo = new InMemoryKeyRepository();
-  const sessionRepo = new InMemorySessionRepository();
-  const auditRepo = new InMemoryAuditRepository();
+  let membershipRepo = new InMemoryMembershipRepository();
+  let keyRepo = new InMemoryKeyRepository();
+  let sessionRepo = new InMemorySessionRepository();
+  let auditRepo = new InMemoryAuditRepository();
+  let postgres: PostgresClient | undefined;
+
+  if (config.repositoryMode === "postgres" && config.databaseUrl) {
+    postgres = new PostgresClient(config.databaseUrl);
+    await migrate(postgres);
+    membershipRepo = new PostgresMembershipRepository(postgres);
+    keyRepo = new PostgresKeyRepository(postgres);
+    sessionRepo = new PostgresSessionRepository(postgres);
+    auditRepo = new PostgresAuditRepository(postgres);
+  }
 
   const membershipRegistry = new MembershipRegistry(
     membershipRepo,
@@ -55,11 +73,19 @@ export function buildApp(config: CustodyConfig) {
 
   const service = new CustodyService(verifier, membershipRegistry, keyRegistry, sessionEngine, auditLog);
 
-  registerHealthRoute(app);
+  registerHealthRoute(app, async () => {
+    if (!postgres) return true;
+    await postgres.query("select 1");
+    return true;
+  });
   registerBotEventsRoute(app, service);
   registerKeysRoute(app, service);
   registerSessionsRoute(app, service);
   registerAuditRoute(app, service);
+
+  app.addHook("onClose", async () => {
+    await postgres?.close();
+  });
 
   return app;
 }

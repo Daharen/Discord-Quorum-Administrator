@@ -6,28 +6,28 @@ import type {
 } from "../types.js";
 
 export interface MembershipRepository {
-  upsert(record: CustodianMembershipRecord): void;
-  get(discordUserId: string): CustodianMembershipRecord | undefined;
-  listAll(): CustodianMembershipRecord[];
+  upsert(record: CustodianMembershipRecord): Promise<void>;
+  get(discordUserId: string): Promise<CustodianMembershipRecord | undefined>;
+  listAll(): Promise<CustodianMembershipRecord[]>;
 }
 
 export interface KeyRepository {
-  create(record: CustodianPublicKeyRecord): void;
-  revokeActiveByUser(discordUserId: string, revokedAtMs: number): void;
-  getActiveByUser(discordUserId: string): CustodianPublicKeyRecord | undefined;
-  listByUser(discordUserId: string): CustodianPublicKeyRecord[];
+  create(record: CustodianPublicKeyRecord): Promise<void>;
+  revokeActiveByUser(discordUserId: string, revokedAtMs: number): Promise<void>;
+  getActiveByUser(discordUserId: string): Promise<CustodianPublicKeyRecord | undefined>;
+  listByUser(discordUserId: string): Promise<CustodianPublicKeyRecord[]>;
 }
 
 export interface SessionRepository {
-  create(session: CustodySessionRecord): void;
-  save(session: CustodySessionRecord): void;
-  get(sessionId: string): CustodySessionRecord | undefined;
-  listAll(): CustodySessionRecord[];
+  create(session: CustodySessionRecord): Promise<void>;
+  save(session: CustodySessionRecord): Promise<void>;
+  get(sessionId: string): Promise<CustodySessionRecord | undefined>;
+  listAll(): Promise<CustodySessionRecord[]>;
 }
 
 export interface AuditRepository {
-  append(entry: AuditEntryRecord): void;
-  list(): AuditEntryRecord[];
+  append(entry: AuditEntryRecord): Promise<void>;
+  list(): Promise<AuditEntryRecord[]>;
 }
 
 export interface SealedKitRecord {
@@ -38,6 +38,6 @@ export interface SealedKitRecord {
 }
 
 export interface SealedKitRepository {
-  upsert(record: SealedKitRecord): void;
-  getCurrent(): SealedKitRecord | undefined;
+  upsert(record: SealedKitRecord): Promise<void>;
+  getCurrent(): Promise<SealedKitRecord | undefined>;
 }

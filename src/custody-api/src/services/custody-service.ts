@@ -14,32 +14,32 @@ export class CustodyService {
     private readonly audit: AuditLog,
   ) {}
 
-  ingestBotEvent(event: SignedGuildBotEventEnvelope): void {
+  async ingestBotEvent(event: SignedGuildBotEventEnvelope): Promise<void> {
     this.verifier.verify(event);
-    const changed = this.membershipRegistry.applyMembershipEvent(event);
+    const changed = await this.membershipRegistry.applyMembershipEvent(event);
     if (event.eventType === "administrator_removed") {
       const discordUserId = String(event.payload.discordUserId);
-      this.keyRegistry.revokeAllForRemovedCustodian(discordUserId);
+      await this.keyRegistry.revokeAllForRemovedCustodian(discordUserId);
     }
-    this.sessionEngine.invalidateSupersededApprovals(changed.policyVersion);
-    this.audit.append("guildbot_event", event.eventId, { eventType: event.eventType, payloadHash: event.payloadHash });
+    await this.sessionEngine.invalidateSupersededApprovals(changed.policyVersion);
+    await this.audit.append("guildbot_event", event.eventId, { eventType: event.eventType, payloadHash: event.payloadHash });
   }
 
-  registerKey(discordUserId: string, publicKeyB64: string): { keyId: string } {
-    const keyId = this.keyRegistry.registerKey(discordUserId, publicKeyB64);
-    this.audit.append("key_registered", keyId, { discordUserId });
+  async registerKey(discordUserId: string, publicKeyB64: string): Promise<{ keyId: string }> {
+    const keyId = await this.keyRegistry.registerKey(discordUserId, publicKeyB64);
+    await this.audit.append("key_registered", keyId, { discordUserId });
     return { keyId };
   }
 
-  createSession(scope: string, actionType: string, payloadData: Record<string, unknown>) {
-    const session = this.sessionEngine.createSession(scope, actionType, payloadData);
-    this.audit.append("session_created", session.sessionId, { scope, actionType, requiredThreshold: session.requiredThreshold });
+  async createSession(scope: string, actionType: string, payloadData: Record<string, unknown>) {
+    const session = await this.sessionEngine.createSession(scope, actionType, payloadData);
+    await this.audit.append("session_created", session.sessionId, { scope, actionType, requiredThreshold: session.requiredThreshold });
     return session;
   }
 
-  approveSession(sessionId: string, signerDiscordUserId: string, signatureB64: string) {
-    const session = this.sessionEngine.submitApproval(sessionId, signerDiscordUserId, signatureB64);
-    this.audit.append("session_approval", sessionId, { signerDiscordUserId, status: session.status });
+  async approveSession(sessionId: string, signerDiscordUserId: string, signatureB64: string) {
+    const session = await this.sessionEngine.submitApproval(sessionId, signerDiscordUserId, signatureB64);
+    await this.audit.append("session_approval", sessionId, { signerDiscordUserId, status: session.status });
     return session;
   }
 

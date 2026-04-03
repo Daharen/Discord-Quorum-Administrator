@@ -5,7 +5,7 @@ import { MembershipRegistry } from "../src/domain/membership-registry.js";
 const clock = { nowMs: () => 1000 };
 
 describe("MembershipRegistry", () => {
-  it("promotes and removes custodians, increments policy", () => {
+  it("promotes and removes custodians, increments policy", async () => {
     const registry = new MembershipRegistry(new InMemoryMembershipRepository(), { numerator: 2, denominator: 3 }, clock);
     const promote = {
       eventId: "e1",
@@ -19,11 +19,11 @@ describe("MembershipRegistry", () => {
       signature: "s",
     } as const;
 
-    registry.applyMembershipEvent(promote);
-    expect(registry.isActive("u1")).toBe(true);
+    await registry.applyMembershipEvent(promote);
+    expect(await registry.isActive("u1")).toBe(true);
 
-    registry.applyMembershipEvent({ ...promote, eventId: "e2", eventType: "administrator_removed" });
-    expect(registry.isActive("u1")).toBe(false);
+    await registry.applyMembershipEvent({ ...promote, eventId: "e2", eventType: "administrator_removed" });
+    expect(await registry.isActive("u1")).toBe(false);
     expect(registry.getPolicyVersion()).toBe(3);
   });
 });

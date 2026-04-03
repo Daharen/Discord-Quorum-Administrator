@@ -9,6 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "crypto-core": "file:../crypto-core",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5"
   },

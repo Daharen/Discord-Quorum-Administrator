@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { generateKeyPair, signPayload, canonicalizePayload, sha256 } from "../../crypto-core/src/index.js";
+import { generateKeyPair, signPayload, canonicalizePayload, sha256 } from "crypto-core";
 import { buildApp } from "../src/app.js";
 
 describe("custody flow integration", () => {
   it("runs bot event -> membership -> key register -> session -> approvals -> authorization", async () => {
     const bot = generateKeyPair();
     const botPub = bot.publicKey.export({ format: "der", type: "spki" }).toString("base64");
-    const app = buildApp({
+    const app = await buildApp({
       port: 0,
       bindHost: "127.0.0.1",
       botPublicKeyB64: botPub,
@@ -17,6 +17,7 @@ describe("custody flow integration", () => {
       encryptionMasterKeyB64: "master",
       auditDir: "runtime",
       eventMaxSkewMs: 99999999,
+      repositoryMode: "memory",
     });
 
     const c1 = generateKeyPair();

@@ -10,18 +10,18 @@ export class KeyRegistry {
     private readonly clock: Clock,
   ) {}
 
-  registerKey(discordUserId: string, publicKeyB64: string): string {
-    if (!this.membershipRegistry.isActive(discordUserId)) {
+  async registerKey(discordUserId: string, publicKeyB64: string): Promise<string> {
+    if (!(await this.membershipRegistry.isActive(discordUserId))) {
       throw new Error("only active custodians can register keys");
     }
 
-    const active = this.keys.getActiveByUser(discordUserId);
+    const active = await this.keys.getActiveByUser(discordUserId);
     if (active) {
-      this.keys.revokeActiveByUser(discordUserId, this.clock.nowMs());
+      await this.keys.revokeActiveByUser(discordUserId, this.clock.nowMs());
     }
 
     const keyId = newId("key");
-    this.keys.create({
+    await this.keys.create({
       keyId,
       discordUserId,
       publicKeyB64,
@@ -31,11 +31,11 @@ export class KeyRegistry {
     return keyId;
   }
 
-  revokeAllForRemovedCustodian(discordUserId: string): void {
-    this.keys.revokeActiveByUser(discordUserId, this.clock.nowMs());
+  async revokeAllForRemovedCustodian(discordUserId: string): Promise<void> {
+    await this.keys.revokeActiveByUser(discordUserId, this.clock.nowMs());
   }
 
-  getActiveKeyForCustodian(discordUserId: string) {
+  async getActiveKeyForCustodian(discordUserId: string) {
     return this.keys.getActiveByUser(discordUserId);
   }
 }

@@ -13,6 +13,8 @@ export interface CustodyConfig {
   encryptionMasterKeyB64: string;
   auditDir: string;
   eventMaxSkewMs: number;
+  repositoryMode: "memory" | "postgres";
+  databaseUrl?: string;
 }
 
 function required(name: string): string {
@@ -33,6 +35,14 @@ export function loadConfig(): CustodyConfig {
   if (numerator >= denominator) {
     throw new Error("CUSTODY_API_DEFAULT_THRESHOLD_NUMERATOR must be < denominator");
   }
+  const repositoryModeRaw = process.env.CUSTODY_API_REPOSITORY_MODE?.trim().toLowerCase() ?? "memory";
+  if (repositoryModeRaw !== "memory" && repositoryModeRaw !== "postgres") {
+    throw new Error("CUSTODY_API_REPOSITORY_MODE must be memory or postgres");
+  }
+  const databaseUrl = process.env.CUSTODY_API_DATABASE_URL?.trim();
+  if (repositoryModeRaw === "postgres" && !databaseUrl) {
+    throw new Error("CUSTODY_API_DATABASE_URL is required when CUSTODY_API_REPOSITORY_MODE=postgres");
+  }
   return {
     port: positiveInt("CUSTODY_API_PORT"),
     bindHost: required("CUSTODY_API_BIND_HOST"),
@@ -49,5 +59,7 @@ export function loadConfig(): CustodyConfig {
     encryptionMasterKeyB64: required("CUSTODY_API_ENCRYPTION_MASTER_KEY_B64"),
     auditDir: required("CUSTODY_API_AUDIT_DIR"),
     eventMaxSkewMs: 120_000,
+    repositoryMode: repositoryModeRaw,
+    databaseUrl,
   };
 }

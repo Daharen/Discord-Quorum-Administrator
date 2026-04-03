@@ -1,0 +1,13 @@
+{
+  "name": "discord-quorum-administrator",
+  "private": true,
+  "workspaces": [
+    "src/crypto-core",
+    "src/custody-api",
+    "src/guildbot"
+  ],
+  "scripts": {
+    "build": "npm run --workspaces build",
+    "test": "npm run --workspaces test"
+  }
+}

@@ -4,15 +4,15 @@ import type { CustodianMembershipRecord } from "../../types.js";
 export class InMemoryMembershipRepository implements MembershipRepository {
   private readonly records = new Map<string, CustodianMembershipRecord>();
 
-  upsert(record: CustodianMembershipRecord): void {
+  async upsert(record: CustodianMembershipRecord): Promise<void> {
     this.records.set(record.discordUserId, record);
   }
 
-  get(discordUserId: string): CustodianMembershipRecord | undefined {
+  async get(discordUserId: string): Promise<CustodianMembershipRecord | undefined> {
     return this.records.get(discordUserId);
   }
 
-  listAll(): CustodianMembershipRecord[] {
+  async listAll(): Promise<CustodianMembershipRecord[]> {
     return [...this.records.values()];
   }
 }

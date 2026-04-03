@@ -9,7 +9,11 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "rootDir": ".",
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "crypto-core": ["../crypto-core/src/index.ts"]
+    }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

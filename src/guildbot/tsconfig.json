@@ -9,7 +9,11 @@
     "skipLibCheck": true,
     "types": ["node", "vitest/globals"],
     "rootDir": ".",
-    "outDir": "dist"
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "crypto-core": ["../crypto-core/src/index.ts"]
+    }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

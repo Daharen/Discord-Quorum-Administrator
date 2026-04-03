@@ -1,4 +1,4 @@
-import { canonicalizePayload, generateNonce, sha256 } from "../../../crypto-core/src/index.js";
+import { canonicalizePayload, generateNonce, sha256 } from "crypto-core";
 import type { Clock } from "../util/clock.js";
 import { generateProposalId } from "../util/ids.js";
 import type { Logger } from "../util/logger.js";

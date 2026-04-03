@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildApp } from "../src/app.js";
-import { generateKeyPair, sha256, canonicalizePayload, signPayload } from "../../crypto-core/src/index.js";
+import { generateKeyPair, sha256, canonicalizePayload, signPayload } from "crypto-core";
 
 describe("POST /bot/events", () => {
   it("accepts valid signed event", async () => {
     const keys = generateKeyPair();
     const pub = keys.publicKey.export({ format: "der", type: "spki" }).toString("base64");
-    const app = buildApp({
+    const app = await buildApp({
       port: 0,
       bindHost: "127.0.0.1",
       botPublicKeyB64: pub,
@@ -17,6 +17,7 @@ describe("POST /bot/events", () => {
       encryptionMasterKeyB64: "x",
       auditDir: "runtime",
       eventMaxSkewMs: 99999999,
+      repositoryMode: "memory",
     });
 
     const payload = { eventType: "administrator_promoted", issuedAtMs: Date.now(), nonce: "n1", guildId: "g1", payload: { discordUserId: "u1" } };
