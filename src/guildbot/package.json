@@ -1,15 +1,21 @@
 {
   "name": "guildbot",
-  "version": "1.0.0",
-  "description": "Responsibility: Discord-native governance bot.",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "Deterministic GuildBot governance runtime",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node bot.ts",
-    "build": "tsc --noEmit"
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
 }
